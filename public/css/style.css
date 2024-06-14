@@ -3,6 +3,16 @@
               background-color: rgb(145, 145, 240);
 } */
 
+body{
+              display: flex;
+              flex-direction: column;
+              min-height: 100vh;
+}
+.container
+{
+              flex:1;
+
+}
 /*nav bar*/
 
 .navbar
@@ -105,4 +115,10 @@
 {
               background-color:white;
               opacity:0.2;
+}
+
+.add-btn
+{
+        background-color:#fe424d !important;    
+        border:none !important;  
 }
