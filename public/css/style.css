@@ -40,7 +40,7 @@
               justify-content:center;
               align-items:center;
 }
-.f-info-socials
+.f-info-socials, .f-info-brand
 { cursor: pointer;
               width:100%;
               font-size:1.2rem;
@@ -66,4 +66,43 @@
               flex-wrap:wrap;
               justify-content:center;
               align-items:space-evenly;
+}
+/* card */
+
+.card
+{
+              border: none;
+              margin-bottom: 2rem;
+}
+
+.card-img-top
+{
+              border-radius: 1rem !important;
+              width:100% !important;
+              object-fit: cover;
+}
+
+.card-body
+{
+              padding:0 !important;
+}
+.card-text p{
+              font-weight: 800 !important;
+}
+
+.listing-link
+{
+              text-decoration:none;
+}
+
+/* Card effect */
+
+.card-img-overlay
+{
+              opacity:0;
+}
+.card-img-overlay:hover
+{
+              background-color:white;
+              opacity:0.2;
 }
