@@ -79,7 +79,7 @@ body{
 }
 /* card */
 
-.card
+.listing-card
 {
               border: none;
               margin-bottom: 2rem;
@@ -142,4 +142,11 @@ body{
 {
     padding-left: 0;
     padding-right:0 ;          
+}
+.delete-btn
+{
+        
+        background-color:#fe424d !important;    
+        border:none !important;  
+        color: white;
 }

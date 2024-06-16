@@ -18,6 +18,12 @@ const listSchema = mongoose.Schema({
   price: Number,
   location: String,
   country: String,
+  reviews: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Review",
+    },
+  ],
 });
 const listModel = mongoose.model("Listing", listSchema);
 module.exports = listModel;
