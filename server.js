@@ -6,6 +6,7 @@ const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const ExpreeError = require("./utils/ExpressError");
+const listings = require("./routes/listing");
 
 const { listingSchema, reviewSchema } = require("./schema"); // Assuming you have a listingSchema defined in schema.js
 const wrapAsync = require("./utils/wrapAsync");
@@ -39,82 +40,83 @@ const validateReview = (req, res, next) => {
     next(); // Proceed to the next middleware or route handler
   }
 };
+app.use("/listings", listings);
 
 // Routes
 
-// New Listing Form
-app.get("/listings/new", (req, res) => {
-  res.render("listings/new");
-});
+// // New Listing Form
+// app.get("/listings/new", (req, res) => {
+//   res.render("listings/new");
+// });
 
-// Show Listing
-app.get(
-  "/listings/:id",
-  wrapAsync(async (req, res, next) => {
-    const { id } = req.params;
-    const listing = await Listing.findById(id).populate("reviews");
-    if (!listing) {
-      throw new ExpreeError(404, "Listing not found");
-    }
-    res.render("listings/show", { listing });
-  })
-);
+// // Show Listing
+// app.get(
+//   "/listings/:id",
+//   wrapAsync(async (req, res, next) => {
+//     const { id } = req.params;
+//     const listing = await Listing.findById(id).populate("reviews");
+//     if (!listing) {
+//       throw new ExpreeError(404, "Listing not found");
+//     }
+//     res.render("listings/show", { listing });
+//   })
+// );
 
-// All Listings
-app.get(
-  "/listings",
-  wrapAsync(async (req, res) => {
-    const allListings = await Listing.find({});
-    res.render("listings/index", { allListings });
-  })
-);
+// // All Listings
+// app.get(
+//   "/listings",
+//   wrapAsync(async (req, res) => {
+//     const allListings = await Listing.find({});
+//     res.render("listings/index", { allListings });
+//   })
+// );
 
-// Create Listing
-app.post(
-  "/listings",
-  wrapAsync(async (req, res, next) => {
-    const { error } = listingSchema.validate(req.body);
-    if (error) {
-      throw new ExpreeError(
-        400,
-        error.details.map((err) => err.message).join(", ")
-      );
-    }
-    const newListing = new Listing(req.body.listing);
-    await newListing.save();
-    res.redirect("/listings");
-  })
-);
+// // Create Listing
+// app.post(
+//   "/listings",
+//   wrapAsync(async (req, res, next) => {
+//     const { error } = listingSchema.validate(req.body);
+//     if (error) {
+//       throw new ExpreeError(
+//         400,
+//         error.details.map((err) => err.message).join(", ")
+//       );
+//     }
+//     const newListing = new Listing(req.body.listing);
+//     await newListing.save();
+//     res.redirect("/listings");
+//   })
+// );
 
-// Edit Listing Form
-app.get(
-  "/listings/:id/edit",
-  wrapAsync(async (req, res) => {
-    const { id } = req.params;
-    const listing = await Listing.findById(id);
-    res.render("listings/edit", { listing });
-  })
-);
+// // Edit Listing Form
+// app.get(
+//   "/listings/:id/edit",
+//   wrapAsync(async (req, res) => {
+//     const { id } = req.params;
+//     const listing = await Listing.findById(id);
+//     res.render("listings/edit", { listing });
+//   })
+// );
 
-// Update Listing
-app.put(
-  "/listings/:id",
-  wrapAsync(async (req, res) => {
-    const { id } = req.params;
-    await Listing.findByIdAndUpdate(id, { ...req.body.listing });
-    res.redirect(`/listings/${id}`);
-  })
-);
+// // Update Listing
+// app.put(
+//   "/listings/:id",
+//   wrapAsync(async (req, res) => {
+//     const { id } = req.params;
+//     await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+//     res.redirect(`/listings/${id}`);
+//   })
+// );
 
-// Delete Listing
-app.delete(
-  "/listings/:id",
-  wrapAsync(async (req, res) => {
-    const { id } = req.params;
-    await Listing.findByIdAndDelete(id);
-    res.redirect("/listings");
-  })
-);
+// // Delete Listing
+// app.delete(
+//   "/listings/:id",
+//   wrapAsync(async (req, res) => {
+//     const { id } = req.params;
+//     await Listing.findByIdAndDelete(id);
+//     res.redirect("/listings");
+//   })
+// );
 
 // Create Review for a Listing
 app.post(
