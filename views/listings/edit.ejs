@@ -4,16 +4,16 @@
    <div class="col-8 offset-2">
     <h3>Edit your Listing</h3>
 
-    <form method="POST" action="/listings/<%= listing._id %>?_method=PUT">
+    <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" class="needs-validation" novalidate>
     <div class="mb-3">
     <label for="title" class ="form-label">Title</label>
-    <input name="listing[title]" value="<%= listing.title %>" type="text" class="form-control"/>
+    <input name="listing[title]" value="<%= listing.title %>" type="text" class="form-control" required/>
     </div>
      <div class="mb-3">
     <label for="description" class ="form-label">Description</label>
     
     
-      <textarea name="listing[description]" class="form-control">
+      <textarea name="listing[description]" class="form-control" required>
 <%= listing.description %></textarea
        >
     </div>
@@ -22,19 +22,19 @@
 
       <div class="mb-3">
        <label for="Image" class ="form-label">Image Link</label>
-        <input name="listing[image]" value="<%= listing.image %>" type="text"   class="form-control"/></div>
+        <input name="listing[image]" value="<%= listing.image %>" type="text"   class="form-control" required/></div>
      
 <div class="row">
     <div class="mb-3 col-md-4">
     <label for="price" class="form-label">Price</label>
-     <input name="listing[price]" number" value="<%= listing.price %>" class="form-control"/>
+     <input name="listing[price]" number" value="<%= listing.price %>" class="form-control" required/>
     </div>
 
      
  <div class="mb-3 col-md-8">
   <label for="country" class="form-label">Country</label>
  <input name="listing[country]"  value="<%= listing.country %>"
-       type="text"  class="form-control"/></div>
+       type="text"  class="form-control" required/></div>
 </div>
  
      
@@ -45,6 +45,7 @@
         value="<%= listing.location %>"
         type="text"
         class="form-control"
+        required
       /></div>
      
 
