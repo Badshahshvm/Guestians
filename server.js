@@ -5,6 +5,9 @@ const Listing = require("./models/listing");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
+const ExpreeError = require("./utils/ExpressError");
+const {listingSchema}=require("./schema.js")
+const wrapAsync = require("./utils/wrapAsync");
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
@@ -15,10 +18,7 @@ app.use(express.static(path.join(__dirname, "/public")));
 
 async function connectToDb() {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/Guestians", {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect("mongodb://127.0.0.1:27017/Guestians", {});
     console.log("Connected to database");
   } catch (err) {
     console.error("Database connection error:", err);
@@ -56,13 +56,23 @@ app.get("/listings", async (req, res) => {
 });
 
 // Create Route
-app.post("/listings", async (req, res) => {
+app.post("/listings", async (req, res, next) => {
   try {
     const newListing = new Listing(req.body.listing);
+    if (
+      !newListing.description ||
+      !newListing.title ||
+      !newListing.price ||
+      !newListing.country ||
+      !newListing.location
+    ) {
+      throw new ExpreeError(400, "Plaese fill the every field");
+    }
     await newListing.save();
     res.redirect("/listings");
   } catch (err) {
     console.error("Error creating listing:", err);
+    next(err);
     res.status(500).send("Server Error");
   }
 });
@@ -102,7 +112,15 @@ app.delete("/listings/:id", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+app.all("*", (req, res, next) => {
+  next(new ExpreeError(404, "Page not found"));
+});
 
+app.use((error, req, res, next) => {
+  let { status = 500, message = "Something went wrong" } = error;
+  // res.status(status).send(message);
+  res.render("listings/error", { error });
+});
 app.listen(4000, () => {
   console.log("Server is running on port 4000");
 });
