@@ -8,6 +8,9 @@
     <div class="mb-3">
     <label for="title" class ="form-label">Title</label>
     <input name="listing[title]" value="<%= listing.title %>" type="text" class="form-control" required/>
+     <div class="valid-feedback">
+   Title Looks good
+    </div>
     </div>
      <div class="mb-3">
     <label for="description" class ="form-label">Description</label>
@@ -16,6 +19,9 @@
       <textarea name="listing[description]" class="form-control" required>
 <%= listing.description %></textarea
        >
+       <div class="invalid-feedback">
+  Plaese Enter a short description
+    </div>
     </div>
       
       
@@ -28,13 +34,19 @@
     <div class="mb-3 col-md-4">
     <label for="price" class="form-label">Price</label>
      <input name="listing[price]" number" value="<%= listing.price %>" class="form-control" required/>
+       <div class="invalid-feedback">
+  Plaese Enter a valid Price
+    </div>
     </div>
 
      
  <div class="mb-3 col-md-8">
   <label for="country" class="form-label">Country</label>
  <input name="listing[country]"  value="<%= listing.country %>"
-       type="text"  class="form-control" required/></div>
+       type="text"  class="form-control" required/>
+         <div class="invalid-feedback">
+  Plaese Enter a valid Country
+    </div></div>
 </div>
  
      
@@ -46,7 +58,10 @@
         type="text"
         class="form-control"
         required
-      /></div>
+      />
+        <div class="invalid-feedback">
+ Location should be vaild
+    </div></div>
      
 
       <button class="btn btn-dark edit-btn mt-3">Edit</button>
