@@ -6,6 +6,8 @@ const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const ExpreeError = require("./utils/ExpressError");
+const session = require("express-session");
+const flash = require("connect-flash");
 // const listings = require("./routes/listing");
 // const reviews = require("./routes/reviews");
 
@@ -25,6 +27,28 @@ mongoose
   });
 
 // Middleware and configurations
+const sessionOptions = {
+  secret: "MySecret",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  },
+};
+app.get("/", (req, res) => {
+  res.send("home page");
+});
+app.use(session(sessionOptions));
+app.use(flash());
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+
+  next();
+});
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.engine("ejs", ejsMate);
@@ -56,7 +80,8 @@ app.get(
     const { id } = req.params;
     const listing = await Listing.findById(id).populate("reviews");
     if (!listing) {
-      throw new ExpreeError(404, "Listing not found");
+      req.flash("error", "Listing You requested for does't exist ");
+      res.redirect("/listings");
     }
     res.render("listings/show", { listing });
   })
@@ -84,6 +109,7 @@ app.post(
     }
     const newListing = new Listing(req.body.listing);
     await newListing.save();
+    req.flash("success", "New Listing created");
     res.redirect("/listings");
   })
 );
@@ -94,6 +120,11 @@ app.get(
   wrapAsync(async (req, res) => {
     const { id } = req.params;
     const listing = await Listing.findById(id);
+    if (!listing) {
+      req.flash("error", "Listing You requested for does't exist ");
+      res.redirect("/listings");
+    }
+    req.flash("success", "Edition is done!...");
     res.render("listings/edit", { listing });
   })
 );
@@ -104,6 +135,7 @@ app.put(
   wrapAsync(async (req, res) => {
     const { id } = req.params;
     await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+    req.flash("success", "List is updated!...");
     res.redirect(`/listings/${id}`);
   })
 );
@@ -114,6 +146,7 @@ app.delete(
   wrapAsync(async (req, res) => {
     const { id } = req.params;
     await Listing.findByIdAndDelete(id);
+    req.flash("success", "Listing is deleted!...");
     res.redirect("/listings");
   })
 );
@@ -133,6 +166,7 @@ app.post(
     listing.reviews.push(newReview);
     await newReview.save();
     await listing.save();
+    req.flash("success", "Review is done!...");
     res.redirect(`/listings/${listing._id}`);
   })
 );
@@ -144,6 +178,7 @@ app.delete(
     let { id, reviewId } = req.params;
     await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
     await Review.findByIdAndDelete(reviewId);
+    req.flash("success", "Review is deleted!...");
     res.redirect(`/listings/${id}`);
   })
 );

@@ -10,8 +10,12 @@ const listSchema = Schema({
   description: String,
   image: {
     type: String,
-    default: "https://www.example.com/default-image.jpg", // simplified default image URL
-    set: (v) => (v ? v : "https://www.example.com/default-image.jpg"), // simplified setter
+    default:
+      "https://static.toiimg.com/thumb/msid-92079511,width-748,height-499,resizemode=4,imgsize-140014/Etiquette-tips-for-a-first-timer-to-a-5-star-hotel.jpg", // simplified default image URL
+    set: (v) =>
+      v
+        ? v
+        : "https://static.toiimg.com/thumb/msid-92079511,width-748,height-499,resizemode=4,imgsize-140014/Etiquette-tips-for-a-first-timer-to-a-5-star-hotel.jpg", // simplified setter
   },
   price: Number,
   location: String,
