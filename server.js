@@ -14,7 +14,7 @@ const User = require("./models/user");
 // const listings = require("./routes/listing");
 // const reviews = require("./routes/reviews");
 const user = require("./routes/user");
-const { isLoggedin } = require("./middleware");
+const { isLoggedin, isOwner, isAuthor } = require("./middleware");
 const { listingSchema, reviewSchema } = require("./schema"); // Assuming you have a listingSchema defined in schema.js
 const wrapAsync = require("./utils/wrapAsync");
 
@@ -92,7 +92,12 @@ app.get(
   wrapAsync(async (req, res, next) => {
     const { id } = req.params;
     const listing = await Listing.findById(id)
-      .populate("reviews")
+      .populate({
+        path: "reviews",
+        populate: {
+          path: "author",
+        },
+      })
       .populate("owner");
     if (!listing) {
       req.flash("error", "Listing You requested for does't exist ");
@@ -152,8 +157,10 @@ app.get(
 app.put(
   "/listings/:id",
   isLoggedin,
+  isOwner,
   wrapAsync(async (req, res) => {
     const { id } = req.params;
+
     await Listing.findByIdAndUpdate(id, { ...req.body.listing });
     req.flash("success", "List is updated!...");
     res.redirect(`/listings/${id}`);
@@ -175,6 +182,7 @@ app.delete(
 // Create Review for a Listing
 app.post(
   "/listings/:id/reviews",
+  isLoggedin,
 
   wrapAsync(async (req, res, next) => {
     const { id } = req.params;
@@ -184,7 +192,9 @@ app.post(
       throw new ExpreeError(400, "Please fill out all fields");
     }
     const newReview = new Review(req.body.review);
+    newReview.author = req.user._id;
     listing.reviews.push(newReview);
+    console.log(newReview);
     await newReview.save();
     await listing.save();
     req.flash("success", "Review is done!...");
@@ -195,6 +205,8 @@ app.post(
 
 app.delete(
   "/listings/:id/reviews/:reviewId",
+  isLoggedin,
+  isAuthor,
   wrapAsync(async (req, res, next) => {
     let { id, reviewId } = req.params;
     await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
