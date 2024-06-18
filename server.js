@@ -8,9 +8,13 @@ const ejsMate = require("ejs-mate");
 const ExpreeError = require("./utils/ExpressError");
 const session = require("express-session");
 const flash = require("connect-flash");
+const passport = require("passport");
+const localStratgy = require("passport-local");
+const User = require("./models/user");
 // const listings = require("./routes/listing");
 // const reviews = require("./routes/reviews");
-
+const user = require("./routes/user");
+const { isLoggedin } = require("./middleware");
 const { listingSchema, reviewSchema } = require("./schema"); // Assuming you have a listingSchema defined in schema.js
 const wrapAsync = require("./utils/wrapAsync");
 
@@ -37,14 +41,18 @@ const sessionOptions = {
     httpOnly: true,
   },
 };
-app.get("/", (req, res) => {
-  res.send("home page");
-});
+
 app.use(session(sessionOptions));
 app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new localStratgy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
+  res.locals.currUser = req.user;
 
   next();
 });
@@ -65,11 +73,16 @@ const validateReview = (req, res, next) => {
     next(); // Proceed to the next middleware or route handler
   }
 };
+app.use("/", user);
 // app.use("/listings", listings);
 // app.use("/listings/:id/reviews", reviews);
 
+app.get("/", (req, res, next) => {
+  res.render("users/home.ejs");
+});
+
 // New Listing Form
-app.get("/listings/new", (req, res) => {
+app.get("/listings/new", isLoggedin, (req, res) => {
   res.render("listings/new");
 });
 
@@ -78,11 +91,14 @@ app.get(
   "/listings/:id",
   wrapAsync(async (req, res, next) => {
     const { id } = req.params;
-    const listing = await Listing.findById(id).populate("reviews");
+    const listing = await Listing.findById(id)
+      .populate("reviews")
+      .populate("owner");
     if (!listing) {
       req.flash("error", "Listing You requested for does't exist ");
       res.redirect("/listings");
     }
+    console.log(listing);
     res.render("listings/show", { listing });
   })
 );
@@ -99,6 +115,7 @@ app.get(
 // Create Listing
 app.post(
   "/listings",
+  isLoggedin,
   wrapAsync(async (req, res, next) => {
     const { error } = listingSchema.validate(req.body);
     if (error) {
@@ -108,6 +125,7 @@ app.post(
       );
     }
     const newListing = new Listing(req.body.listing);
+    newListing.owner = req.user._id;
     await newListing.save();
     req.flash("success", "New Listing created");
     res.redirect("/listings");
@@ -117,6 +135,7 @@ app.post(
 // Edit Listing Form
 app.get(
   "/listings/:id/edit",
+  isLoggedin,
   wrapAsync(async (req, res) => {
     const { id } = req.params;
     const listing = await Listing.findById(id);
@@ -132,6 +151,7 @@ app.get(
 // Update Listing
 app.put(
   "/listings/:id",
+  isLoggedin,
   wrapAsync(async (req, res) => {
     const { id } = req.params;
     await Listing.findByIdAndUpdate(id, { ...req.body.listing });
@@ -143,6 +163,7 @@ app.put(
 // Delete Listing
 app.delete(
   "/listings/:id",
+  isLoggedin,
   wrapAsync(async (req, res) => {
     const { id } = req.params;
     await Listing.findByIdAndDelete(id);
@@ -183,6 +204,14 @@ app.delete(
   })
 );
 
+app.get("/demouser", async (req, res) => {
+  const fakeUser = new User({
+    email: "shiva@gmail.com",
+    username: "Shivika",
+  });
+  const saveUser = await User.register(fakeUser, "hello");
+  res.send(saveUser);
+});
 // Error Handling Middleware
 app.all("*", (req, res, next) => {
   next(new ExpreeError(404, "Page not found"));
