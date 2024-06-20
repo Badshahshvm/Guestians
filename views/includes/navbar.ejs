@@ -1,27 +1,83 @@
-<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
+<style>
+  .btn-search {
+    background-color: #fe424d;
+    color: white;
+  }
+
+  .btn-search:hover {
+    background-color: #fe424d;
+    color: white;
+  }
+
+  /* Media queries for responsive design */
+  @media (max-width: 768px) {
+    .navbar {
+      background-color: #fe424d; /* Background color for small screens */
+    }
+
+    .navbar .navbar-nav {
+      margin: 0;
+    }
+
+    .navbar .navbar-nav .nav-link {
+      color: white !important; /* Adjust nav link color for visibility */
+    }
+
+    .navbar-toggler {
+      border-color: white; /* Toggler border color for visibility */
+    }
+
+    .navbar-collapse {
+      background-color: #fe424d; /* Background color for collapsed menu */
+      padding: 1rem; /* Padding around collapsed menu items */
+      border-radius: 0.5rem; /* Rounded corners for collapsed menu */
+    }
+
+    .navbar-collapse .navbar-nav .nav-link {
+      color: white !important; /* Adjust nav link color for visibility */
+    }
+
+    /* Hide search form on small screens */
+    .navbar .navbar-nav .search-form {
+      display: none;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 992px) {
+    .navbar {
+      background-color: #fe424d; /* Background color for medium screens */
+    }
+  }
+</style>
+
+<nav class="navbar navbar-expand-md bg-light border-bottom sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/"> <i class="fa-sharp fa-solid fa-compass"></i></a>
+    <a class="navbar-brand" href="/">
+      <i class="fas fa-compass"></i>
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-link "href="/">Home</a>
-        <a class="nav-link" href="/listings">All Listings</a>
-        <a class="nav-link" href="/listings/new">Add new Listing</a>
-        
+        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/listings">Explore</a>
       </div>
-       <div class="navbar-nav ms-auto">
-       <% if(!currUser) {%>
-        <a class="nav-link "href="/signup">Signup</a>
-        <a class="nav-link" href="/login">login</a>
-            <%}%>
-            <%if(currUser){%>
-          <a class="nav-link" href="/logout">logout</a>
-          <%}%>
-      
-       
-        
+      <div class="navbar-nav m-auto">
+        <!-- Search form with a custom class for targeting in CSS -->
+        <form class="d-flex search-form" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-search" type="submit">Search</button>
+        </form>
+      </div>
+      <div class="navbar-nav ms-auto">
+        <a class="nav-link" href="/listings/new">Add Your Place</a>
+        <% if(!currUser) { %>
+          <a class="nav-link me-2" href="/signup"><b>Signup</b></a>
+          <a class="nav-link" href="/login"><b>Login</b></a>
+        <% } else { %>
+          <a class="nav-link" href="/logout">Logout</a>
+        <% } %>
       </div>
     </div>
   </div>

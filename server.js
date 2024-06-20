@@ -1,18 +1,26 @@
 const express = require("express");
 const mongoose = require("mongoose");
+if (process.env.NODE_ENV != "production") {
+  require("dotenv").config();
+}
 const Listing = require("./models/listing");
+
 const Review = require("./models/review");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 const ExpreeError = require("./utils/ExpressError");
 const session = require("express-session");
+const mongoStore = require("connect-mongo");
 const flash = require("connect-flash");
 const passport = require("passport");
 const localStratgy = require("passport-local");
 const User = require("./models/user");
 // const listings = require("./routes/listing");
 // const reviews = require("./routes/reviews");
+const multer = require("multer");
+const { storage } = require("./cloudconfig.js");
+const upload = multer({ storage });
 const user = require("./routes/user");
 const { isLoggedin, isOwner, isAuthor } = require("./middleware");
 const { listingSchema, reviewSchema } = require("./schema"); // Assuming you have a listingSchema defined in schema.js
@@ -21,17 +29,38 @@ const wrapAsync = require("./utils/wrapAsync");
 const app = express();
 
 // Connect to MongoDB
+// mongoose
+//   .connect("mongodb://127.0.0.1:27017/Guestians")
+//   .then(() => {
+//     console.log("Connected to database");
+//   })
+//   .catch((err) => {
+//     console.error("Database connection error:", err);
+//   });
+
+const dbUrl = process.env.ATLAS;
 mongoose
-  .connect("mongodb://127.0.0.1:27017/Guestians")
+  .connect(dbUrl)
   .then(() => {
     console.log("Connected to database");
   })
   .catch((err) => {
     console.error("Database connection error:", err);
   });
+const store = mongoStore.create({
+  mongoUrl: dbUrl,
+  crypto: {
+    secret: "MySecret",
+  },
+  touchAfter: 24 * 3600,
+});
 
+store.on("error", () => {
+  console.log("error in mongo store", error);
+});
 // Middleware and configurations
 const sessionOptions = {
+  store: store,
   secret: "MySecret",
   resave: false,
   saveUninitialized: true,
@@ -89,9 +118,11 @@ app.get("/listings/new", isLoggedin, (req, res) => {
 // Show Listing
 app.get(
   "/listings/:id",
+  isLoggedin,
   wrapAsync(async (req, res, next) => {
     const { id } = req.params;
     const listing = await Listing.findById(id)
+      .populate("reviews")
       .populate({
         path: "reviews",
         populate: {
@@ -121,17 +152,25 @@ app.get(
 app.post(
   "/listings",
   isLoggedin,
+  upload.single("listing[image]"),
   wrapAsync(async (req, res, next) => {
-    const { error } = listingSchema.validate(req.body);
-    if (error) {
-      throw new ExpreeError(
-        400,
-        error.details.map((err) => err.message).join(", ")
-      );
-    }
+    // const { error } = listingSchema.validate(req.body);
+    // if (error) {
+    //   throw new ExpreeError(
+    //     400,
+    //     error.details.map((err) => err.message).join(", ")
+    //   );
+    // }
+
+    const url = req.file.path;
+    const filename = req.file.filename;
+    console.log(url, "....", filename);
+
     const newListing = new Listing(req.body.listing);
     newListing.owner = req.user._id;
+    newListing.image = { url, filename };
     await newListing.save();
+
     req.flash("success", "New Listing created");
     res.redirect("/listings");
   })
@@ -158,10 +197,22 @@ app.put(
   "/listings/:id",
   isLoggedin,
   isOwner,
+  upload.single("listing[image]"),
   wrapAsync(async (req, res) => {
     const { id } = req.params;
 
-    await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+    const listing = await Listing.findByIdAndUpdate(id, {
+      ...req.body.listing,
+    });
+    if (typeof req.file !== "undefined") {
+      const url = req.file.path;
+      const filename = req.file.filename;
+      console.log(url, "....", filename);
+
+      listing.image = { url, filename };
+      await listing.save();
+    }
+
     req.flash("success", "List is updated!...");
     res.redirect(`/listings/${id}`);
   })

@@ -3,7 +3,9 @@ const initData = require("./data");
 const Listing = require("../models/listing");
 const data = require("./data");
 
-const MONGO_URL = "mongodb://127.0.0.1:27017/Guestians";
+const MONGO_URL =
+  process.env.ATLAS ||
+  "mongodb+srv://badshahshvm766:oNXOXDybSeSJ3hRD@cluster0.zztp2rf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 main()
   .then(() => {

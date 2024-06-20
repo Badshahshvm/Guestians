@@ -1,22 +1,83 @@
 
 <%layout("/Layouts/boilerplate.ejs")%>
+<style>
+  /* Default styles */
+  .jumbotron {
+    padding: 4rem 2rem;
+    margin-bottom: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    position: relative;
+  }
 
-  <!-- Page content -->
-  <div class="container">
-    <div class="jumbotron">
-      <img src="https://images.squarespace-cdn.com/content/v1/571a88642b8dde690c217bf0/1614586299898-AI5MZSZ1ZGYBPHZVWU04/hotel-website-design-example-palm-island-resort.jpg" alt="Hotel Image" class="jumbotron-image">
-      <div class="jumbotron-content">
-        <h1 class="display-4">Welcome to Your Guestians</h1>
-        <p class="lead">Experience luxury and comfort like never before.</p>
-        <a class="btn btn-primary btn-lg" href="/listings" role="button">Explore Rooms</a>
-      </div>
-      <!-- Animation -->
-      <div class="animation-target">
-        <img src="https://cdn.pixabay.com/photo/2019/08/19/13/58/bed-4416515_1280.jpg" alt="Floating Animation" class="img-fluid">
-      </div>
+  .jumbotron-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+  }
+
+  .jumbotron-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #333;
+    z-index: 1;
+  }
+
+  .jumbotron-content h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .jumbotron-content p {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Media queries for responsive design */
+  @media (max-width: 768px) {
+    .jumbotron {
+      padding: 3rem 1.5rem;
+    }
+
+    .jumbotron-content h1 {
+      font-size: 2rem;
+   
+      margin-top:5px;
+    }
+
+    .jumbotron-content p {
+      font-size: 1rem;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 992px) {
+    .jumbotron-content h1 {
+      font-size: 2rem;
+    }
+
+    .jumbotron-content p {
+      font-size: 1.1rem;
+    }
+  }
+</style>
+
+<!-- Page content -->
+<div class="container">
+  <div class="jumbotron">
+    <img src="https://images.squarespace-cdn.com/content/v1/571a88642b8dde690c217bf0/1614586299898-AI5MZSZ1ZGYBPHZVWU04/hotel-website-design-example-palm-island-resort.jpg" alt="Hotel Image" class="jumbotron-image">
+    <div class="jumbotron-content">
+      <h1 class="display-4"> Guestians</h1>
+      <p class="lead">Experience luxury and comfort like never before.</p>
+      <a class="btn btn-primary btn-lg" href="/listings" role="button">Explore Rooms</a>
     </div>
-
+    <!-- Animation -->
+    <div class="animation-target">
+      <img src="https://cdn.pixabay.com/photo/2019/08/19/13/58/bed-4416515_1280.jpg" alt="Floating Animation" class="img-fluid">
     </div>
   </div>
+</div>
 
   

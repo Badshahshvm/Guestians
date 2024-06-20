@@ -215,3 +215,20 @@ body{
         width: 200px;
         animation: float 3s ease-in-out infinite;
       }
+
+      #map{
+
+        height: 100px;
+        width: 100px;
+         
+      
+      }
+
+      .signup
+      {
+        color: #ebebeb !important;
+      }
+ .login
+ {
+  color: #ebebeb !important;
+ }
